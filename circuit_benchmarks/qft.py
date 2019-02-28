@@ -11,9 +11,9 @@ import math
 from qiskit import QuantumRegister, QuantumCircuit
 
 
-def qft(number_qubits: int):
+def qft_circuit(number_qubits: int):
     """Create quantum fourier transform circuit on quantum register qreg."""
-    qreg = QuantumRegister(number_qubits)
+    qreg = QuantumRegister(number_qubits, name="myreg")
     circuit = QuantumCircuit(qreg, name="qft")
 
     for i in range(number_qubits):
