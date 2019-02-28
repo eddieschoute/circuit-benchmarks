@@ -36,6 +36,16 @@ from qiskit_chemistry.drivers import PySCFDriver, UnitsType
 from qiskit_chemistry.aqua_extensions.components.variational_forms import UCCSD
 
 
+# A list of molecules to use in benchmarking (can be grown larger)
+H2 = 'H .0 .0 .0; H .0 .0 0.735'
+LiH = 'Li .0 .0 .0; H .0 .0 1.6'
+NaH = 'Na .0 .0 .0; H .0 .0 1.9'
+molecules = [H2, LiH, NaH]
+
+# A list of bases to use in benchmarking (can be grown larger)
+bases = ['sto3g', '631g', 'ccpVDZ']
+
+
 def mol_info_pyscf(atom_coords, basis_set, unit):
     """
         Derives the number of particles and spin orbitals of a molecular system
@@ -103,8 +113,17 @@ def UCCSD_qc(molecule, active_occupied=[], active_unoccupied=[],
             map_type='parity', two_qubit_reduction=False,
             depth=1):
     """
-        Generates a UCCSD circuit for H2 in sto-3g basis
+        Generates a UCCSD circuit for the input molecule and basis set
         By default, no active orbitals are specified, and there is no 2-qubit reduction
+
+        Args:
+            molecule: a 3-tuple containing the atom coordinates (string), the basis set (string) and
+            the distance unit (qiskit_chemistry.drivers.UnitsType) used by the pySCF driver.
+
+            Other parameters such as active orbitals, depth and symmetry / qubit reduction
+
+        Returns:
+            The UCCSD quantum circuit object (QuantumCircuit)
     """
 
     atom_coords, basis_set, unit = molecule[:]
@@ -115,143 +134,3 @@ def UCCSD_qc(molecule, active_occupied=[], active_unoccupied=[],
                             active_occupied=active_occupied, active_unoccupied=active_unoccupied,
                             depth=depth)
     return circuit
-
-# Some molecules
-H2 = 'H .0 .0 .0; H .0 .0 0.735'
-LiH = 'Li .0 .0 .0; H .0 .0 1.6'
-NaH = 'Na .0 .0 .0; H .0 .0 1.9'
-molecules = [H2, LiH, NaH]
-
-# Some bases
-bases = ['sto3g', '631g', 'ccpVDZ']
-
-# How the resource required by a quantum circuit scale with molecule size, for a given basis
-for m in molecules:
-    print("Molecule ---- ")
-    qc = UCCSD_qc((m, 'sto3g', UnitsType.ANGSTROM), active_occupied=[], active_unoccupied=[],
-                   map_type='parity', two_qubit_reduction=False,
-                   depth=1)
-    print(qc.width(), qc.depth(), qc.size())
-    print(qc.count_ops())
-
-# How the resource required by a quantum circuit scale with basis size, for a given molecule
-for b in bases:
-    print("Quantum circuit for H2 in ", b, " basis")
-    qc = UCCSD_qc((H2, b, UnitsType.ANGSTROM), active_occupied=[], active_unoccupied=[],
-                   map_type='parity', two_qubit_reduction=False,
-                   depth=1)
-    print(qc.width(), qc.depth(), qc.size())
-    print(qc.count_ops())
-
-
-def UCCSD_H2_sto3g(active_occupied=[], active_unoccupied=[],
-                   map_type='parity', two_qubit_reduction=False,
-                   depth=1):
-    """
-        Generates a UCCSD circuit for H2 in sto-3g basis
-        By default, no active orbitals are specified, and there is no 2-qubit reduction
-    """
-
-    atom_coords = 'H .0 .0 .0; H .0 .0 0.735'
-    basis_set = 'sto3g'
-    unit = UnitsType.ANGSTROM
-
-    n_particles, n_spin_orbitals = mol_info_pyscf(atom_coords, basis_set, unit)
-    circuit = UCCSD_circuit(n_particles, n_spin_orbitals,
-                            map_type=map_type, two_qubit_reduction=two_qubit_reduction,
-                            active_occupied=active_occupied, active_unoccupied=active_unoccupied,
-                            depth=depth)
-    return circuit
-
-
-def UCCSD_H2_631g(active_occupied=[], active_unoccupied=[],
-                  map_type='parity', two_qubit_reduction=False,
-                  depth=1):
-    """
-        Generates a UCCSD circuit for H2 in 6-31g basis
-        By default, no active orbitals are specified, there is no 2-qubit reduction, depth is set to 1
-    """
-
-    atom_coords = 'H .0 .0 .0; H .0 .0 0.735'
-    basis_set = '631g'
-    unit = UnitsType.ANGSTROM
-
-    n_particles, n_spin_orbitals = mol_info_pyscf(atom_coords, basis_set, unit)
-    circuit = UCCSD_circuit(n_particles, n_spin_orbitals,
-                            map_type=map_type, two_qubit_reduction=two_qubit_reduction,
-                            active_occupied=active_occupied, active_unoccupied=active_unoccupied,
-                            depth=depth)
-    return circuit
-
-
-def UCCSD_H2_ccpVDZ(active_occupied=[], active_unoccupied=[],
-                  map_type='parity', two_qubit_reduction=False,
-                  depth=1):
-    """
-        Generates a UCCSD circuit for H2 in 6-31g basis
-        By default, no active orbitals are specified, there is no 2-qubit reduction, depth is set to 1
-    """
-
-    atom_coords = 'H .0 .0 .0; H .0 .0 0.735'
-    basis_set = 'ccpVDZ'
-    unit = UnitsType.ANGSTROM
-
-    n_particles, n_spin_orbitals = mol_info_pyscf(atom_coords, basis_set, unit)
-    circuit = UCCSD_circuit(n_particles, n_spin_orbitals,
-                            map_type=map_type, two_qubit_reduction=two_qubit_reduction,
-                            active_occupied=active_occupied, active_unoccupied=active_unoccupied,
-                            depth=depth)
-    return circuit
-
-
-def UCCSD_LiH_sto3g(active_occupied=[], active_unoccupied=[],
-                    map_type='parity', two_qubit_reduction=False,
-                    depth=1):
-    """
-        Generates a UCCSD circuit for LiH in sto-3g basis
-        By default, no active orbitals are specified, there is no 2-qubit reduction, depth is set to 1
-    """
-
-    atom_coords = 'Li .0 .0 .0; H .0 .0 1.6'
-    basis_set = 'sto-3g'
-    unit = UnitsType.ANGSTROM
-
-    n_particles, n_spin_orbitals = mol_info_pyscf(atom_coords, basis_set, unit)
-    circuit = UCCSD_circuit(n_particles, n_spin_orbitals,
-                            map_type=map_type, two_qubit_reduction=two_qubit_reduction,
-                            active_occupied=active_occupied, active_unoccupied=active_unoccupied,
-                            depth=depth)
-    return circuit
-
-
-def UCCSD_NaH_sto3g(active_occupied=[], active_unoccupied=[],
-                    map_type='parity', two_qubit_reduction=False,
-                    depth=1):
-    """
-        Generates a UCCSD circuit for NaH in sto-3g basis
-        By default, no active orbitals are specified, there is no 2-qubit reduction, depth is set to 1
-    """
-
-    atom_coords = 'Na .0 .0 .0; H .0 .0 1.9'
-    basis_set = 'sto-3g'
-    unit = UnitsType.ANGSTROM
-
-    n_particles, n_spin_orbitals = mol_info_pyscf(atom_coords, basis_set, unit)
-    circuit = UCCSD_circuit(n_particles, n_spin_orbitals,
-                            map_type=map_type, two_qubit_reduction=two_qubit_reduction,
-                            active_occupied=active_occupied, active_unoccupied=active_unoccupied,
-                            depth=depth)
-    return circuit
-
-
-# qc = UCCSD_H2_sto3g()
-# print(qc.width(), qc.depth(), qc.size())
-# print(qc.count_ops())
-#
-# qc = UCCSD_H2_631g()
-# print(qc.width(), qc.depth(), qc.size())
-# print(qc.count_ops())
-#
-# qc = UCCSD_H2_ccpVDZ()
-# print(qc.width(), qc.depth(), qc.size())
-# print(qc.count_ops())
