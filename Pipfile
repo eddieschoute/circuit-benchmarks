@@ -5,11 +5,15 @@ verify_ssl = true
 
 [dev-packages]
 qiskit-aer = "*"
+jupyter = "*"
+matplotlib = "*"
 
 [packages]
 cython = "*"
-qiskit-terra = {git = 'https://github.com/Qiskit/qiskit-terra.git', editable = true}
+qiskit-terra = {git = 'https://github.com/Qiskit/qiskit-terra.git',editable = true}
 qiskit-aqua = "*"
+qiskit-chemistry = "*"
+pyscf = "*"
 
 [requires]
 python_version = "3.7"
