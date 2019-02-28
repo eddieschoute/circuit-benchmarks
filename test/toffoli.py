@@ -5,8 +5,7 @@ from circuit_benchmarks.toffoli import *
 from qiskit import Aer, execute
 
 class TestToffoli(TestCase):
-    # @unittest.skip("not a test")
-    def test_print_toffoli(self) -> None:
+    def test_3_ntoffoli(self) -> None:
         number_qubits = 3
         toff_circ = toffoli(number_qubits)
         # Construct a simulation circuit
