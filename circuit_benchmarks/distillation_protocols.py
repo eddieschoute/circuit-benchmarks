@@ -3,7 +3,7 @@
 
 import numpy as np
 from qiskit import ClassicalRegister, QuantumRegister, QuantumCircuit
-from distillutils import standard_form, bravyi_haah_stabz, bravyi_haah_stabx
+from .distillutils import standard_form, bravyi_haah_stabz, bravyi_haah_stabx
 
 
 def a_state(qr, j):
