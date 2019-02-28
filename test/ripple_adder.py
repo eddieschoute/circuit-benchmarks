@@ -106,25 +106,22 @@ class TestRippleAdder(TestCase):
 
         self.assertEqual({"000"}, set(counts.keys()))
 
-    def test_adder(self) -> None:
+    def test_adder_ones(self) -> None:
         nr_qubits = 6
-        n = (nr_qubits - 2) // 2
+        n = ((nr_qubits - 2) // 2)*2
         adder_circuit = ripple_adder(nr_qubits)
-        cin, a, b, cout = adder_circuit.qregs
-        c_a = ClassicalRegister(n)
-        c_b = ClassicalRegister(n)
+        cin, a, cout = adder_circuit.qregs
         c_cin = ClassicalRegister(1)
+        c_a = ClassicalRegister(n)
         c_cout = ClassicalRegister(1)
 
-        qc = QuantumCircuit(a, b, cin, cout, c_a, c_b, c_cin, c_cout)
+        qc = QuantumCircuit(cin, a, cout, c_a, c_cin, c_cout)
         # 011110
         # a=11 + b=11 = 110
         qc.x(a)
-        qc.x(b)
         qc.extend(adder_circuit)
         qc.measure(cin, c_cin)
         qc.measure(a, c_a)
-        qc.measure(b, c_b)
         qc.measure(cout, c_cout)
 
         # simulate the circuit
@@ -133,5 +130,31 @@ class TestRippleAdder(TestCase):
         counts = result.get_counts(qc)
 
         print(counts)
-        # z \xor s_2, ancilla, s1s0, a1a0
-        self.assertEqual({"1 0 10 11"}, set(counts.keys()))
+        # z \xor s_2, ancilla, a1s1a0s0
+        self.assertEqual({"1 0 1110"}, set(counts.keys()))
+
+    def test_adder_two(self) -> None:
+        nr_qubits = 6
+        n = ((nr_qubits - 2) // 2)*2
+        adder_circuit = ripple_adder(nr_qubits)
+        cin, a, cout = adder_circuit.qregs
+        c_cin = ClassicalRegister(1)
+        c_a = ClassicalRegister(n)
+        c_cout = ClassicalRegister(1)
+
+        qc = QuantumCircuit(cin, a, cout, c_a, c_cin, c_cout)
+        # 000110
+        # a=01 + b=01 = 010
+        qc.x(a[:2])
+        qc.extend(adder_circuit)
+        qc.measure(cin, c_cin)
+        qc.measure(a, c_a)
+        qc.measure(cout, c_cout)
+
+        # simulate the circuit
+        simulator = Aer.get_backend('qasm_simulator')
+        result = execute(qc, simulator).result()
+        counts = result.get_counts(qc)
+
+        # z \xor s_2, ancilla, a1s1a0s0
+        self.assertEqual({"0 0 0110"}, set(counts.keys()))

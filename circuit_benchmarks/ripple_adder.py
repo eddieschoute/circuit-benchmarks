@@ -23,22 +23,21 @@ def ripple_adder(number_qubits: int):
     Finds an adder that uses at most number_qubits qubits.
     For odd number_qubits this means that one qubit is not used.
     """
-    n = (number_qubits - 2) // 2
-    a = QuantumRegister(n)
-    b = QuantumRegister(n)
+    n = ((number_qubits - 2) // 2) * 2
     cin = QuantumRegister(1)
+    a = QuantumRegister(n)
     cout = QuantumRegister(1)
 
     # Build a temporary subcircuit that adds a to b,
     # storing the result in b
-    adder_circuit = QuantumCircuit(cin, a, b, cout, name="ripple_adder")
-    adder_circuit.majority(cin[0], b[0], a[0])
-    for j in range(n - 1):
-        adder_circuit.majority(a[j], b[j + 1], a[j + 1])
+    adder_circuit = QuantumCircuit(cin, a, cout, name="ripple_adder")
+    adder_circuit.majority(cin[0], a[0], a[1])
+    for j in range((n - 2)//2):
+        adder_circuit.majority(a[2*j + 1], a[2*j + 2], a[2*j + 3])
     adder_circuit.cx(a[n - 1], cout[0])
-    for j in reversed(range(n - 1)):
-        adder_circuit.umaj_add(a[j], b[j + 1], a[j + 1])
-    adder_circuit.umaj_add(cin[0], b[0], a[0])
+    for j in reversed(range((n-2)//2)):
+        adder_circuit.umaj_add(a[2*j + 1], a[2*j + 2], a[2*j + 3])
+    adder_circuit.umaj_add(cin[0], a[0], a[1])
 
     return adder_circuit
 
