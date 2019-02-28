@@ -4,9 +4,11 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
+qiskit-aer = "*"
 
 [packages]
-qiskit-terra = "*"
+cython = "*"
+qiskit-terra = {git = 'https://github.com/Qiskit/qiskit-terra.git', editable = true}
 qiskit-aqua = "*"
 
 [requires]
